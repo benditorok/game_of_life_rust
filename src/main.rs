@@ -1,12 +1,8 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use sdl2::rect::{Point, Rect};
-use sdl2::render::{Canvas, Texture, TextureCreator};
-use sdl2::video::{Window, WindowContext};
+use sdl2::rect::Point;
 use rand::{prelude::*, Error};
-use std::ops::{Index, IndexMut};
-use std::time::Duration;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
@@ -60,7 +56,7 @@ pub fn main() -> Result<(), String> {
         points = calc_is_alive(&points).unwrap();
 
         canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
-        canvas.draw_points(cells_to_points(&points).as_slice()).unwrap();
+        canvas.draw_points(cells_to_points(&points).unwrap().as_slice()).unwrap();
 
         canvas.present();
     }
@@ -98,7 +94,7 @@ fn calc_is_alive(cells: &Vec<Vec<bool>>) -> Result<Vec<Vec<bool>>, Error> {
     Ok(edited)
 }
 
-fn cells_to_points(cells: &Vec<Vec<bool>>) -> Vec<Point> {
+fn cells_to_points(cells: &[Vec<bool>]) -> Result<Vec<Point>, Error> {
     let mut converted: Vec<Point> = Vec::new();  
 
     for (x, row) in cells.iter().enumerate()  {
@@ -109,5 +105,5 @@ fn cells_to_points(cells: &Vec<Vec<bool>>) -> Vec<Point> {
         }
     } 
 
-    converted
+    Ok(converted)
 }
