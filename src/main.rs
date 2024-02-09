@@ -1,6 +1,5 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 use sdl2::render::{Canvas, Texture, TextureCreator};
@@ -11,7 +10,7 @@ use std::time::Duration;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
-
+const RENDER_SCALE: f32 = 2.0;
 pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -29,12 +28,10 @@ pub fn main() -> Result<(), String> {
         .unwrap();
 
     let mut event_pump = sdl_context.event_pump().unwrap();
-
-    let mut rng = rand::thread_rng();
-
-    let mut points: Vec<Vec<bool>> = vec![vec![false; WINDOW_HEIGHT as usize]; WINDOW_WIDTH as usize];
     
-    // Init
+    // Initialize random starting cells
+    let mut points: Vec<Vec<bool>> = vec![vec![false; WINDOW_HEIGHT as usize]; WINDOW_WIDTH as usize];
+
     for row in &mut points  {
         for point in &mut row.iter_mut() {
             let value = rand::thread_rng().gen_range(0..=8);
@@ -46,7 +43,8 @@ pub fn main() -> Result<(), String> {
         }
     } 
 
-    //canvas.set_scale(2.0, 2.0)?;
+    // Note increases the memory usage?
+    canvas.set_scale(RENDER_SCALE, RENDER_SCALE)?;
 
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -71,6 +69,7 @@ pub fn main() -> Result<(), String> {
 }
 
 fn calc_is_alive(cells: &Vec<Vec<bool>>) -> Result<Vec<Vec<bool>>, Error> {
+    // TODO modify this without cloning?
     let mut edited = cells.to_owned();
 
     for (x, row) in edited.iter_mut().enumerate()  {
